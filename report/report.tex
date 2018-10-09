@@ -1,0 +1,98 @@
+ 
+
+% !TeX encoding = UTF-8
+\documentclass[11pt,a4paper,twoside,svgnames]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ENCODAGES, LANGUES, AMS ET AUTRES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,frenchb]{babel}
+%
+\frenchbsetup{StandardLists=true}
+\usepackage{enumitem}
+\usepackage{xspace}
+\usepackage{amssymb,mathtools,pifont}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listingsutf8}
+
+\lstset{literate=
+	{á}{{\'a}}1
+	{à}{{\`a}}1
+	{é}{{\'e}}1
+	{è}{{\`e}}1
+	{í}{{\'i}}1
+	{ó}{{\'o}}1
+	{ü}{{\"u}}1
+	{ô}{{\^o}}1
+	{ú}{{\'u}}1,
+	language=java,
+	basicstyle=\footnotesize,
+	breaklines=true,
+	frame=single,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	extendedchars=true
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% MARGES, ENTÊTES ET PIEDS DE PAGE, TITRE
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\usepackage[hcentering=true,nomarginpar,textwidth=426.8pt,textheight=650.2pt,headheight=24pt]{geometry}
+%
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\renewcommand{\headrulewidth}{0pt}
+	\renewcommand{\footrulewidth}{0pt}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LO]{MLG -- 2018}
+\fancyhead[RO,LE]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+%
+\usepackage{sectsty}
+\allsectionsfont{\color{DarkGreen}}
+\title{\color{DarkGreen}\huge\bfseries Data Management : Lab 1}
+\author{Antoine Friant}
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+	%rendu : lab1\_friant\_ransome.zip	
+	%contient : report.pdf + sources ("src/" + "pom.xml")
+	
+	\section{Understanding the Lucene API}
+	
+	\subsection{Does the command line demo use stopword removal?}
+	Yes, because the query "a an or and at query response" returned the exact same results as "query response". If it weren't using stopword removal, we'd get less results when using stopwords.
+	
+	\subsection{"Does the command line demo use stemming ?"}
+	No, because the queries "query" and "queries" don't give the same number of results.
+	
+	\subsection{"Is the search of the command line demo case insensitive ?"}
+	Yes, because "QUERY" and "query" give the same results.
+	
+	\subsection{"Does it matter whether stemming occurs before or after stopword removal ?"}
+	It only matters if stopwords find themselves grouped with non stopwords after the stemming step. If such a thing is possible, then we need to remove stopwords before stemming. If we don't, words from the query could be ignored or stopwords could change the result of the query.
+	
+	\section{}
+	
+\end{document}
+ 
