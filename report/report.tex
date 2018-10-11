@@ -92,7 +92,12 @@
 	\subsection{"Does it matter whether stemming occurs before or after stopword removal ?"}
 	It only matters if stopwords find themselves grouped with non stopwords after the stemming step. If such a thing is possible, then we need to remove stopwords before stemming. If we don't, words from the query could be ignored or stopwords could change the result of the query.
 	
-	\section{}
+	\section{Indexing and Searching the CACM collection}
+	\subsection{Explain which field type can be used for id, title, summary and author}
+	We need an integer for "id" so LongPoint or IntPoint. The others need to be TextField to perform full-text searches.
+	
+	
+	
 	
 \end{document}
  
