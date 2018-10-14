@@ -7,7 +7,10 @@ import ch.heigvd.iict.dmg.labo1.similarities.MySimilarity;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.shingle.ShingleAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.similarities.Similarity;
 
@@ -21,15 +24,16 @@ public class Main {
         // 1.1. create an analyzer
         Analyzer analyser = getAnalyzer();
 
-        // TODO student "Tuning the Lucene Score"
-//		Similarity similarity = null;//new MySimilarity();
         Similarity similarity = new MySimilarity();
-
         CACMIndexer indexer = new CACMIndexer(analyser, similarity);
         indexer.openIndex();
         CACMParser parser = new CACMParser("documents/cacm.txt", indexer);
-        parser.startParsing();
-        indexer.finalizeIndex();
+
+        long time = System.currentTimeMillis();
+        parser.startParsing(); // parse and index
+        System.out.println("Index built in " + (System.currentTimeMillis() - time) + " ms");
+
+        indexer.finalizeIndex(); // write to disk
 
         QueriesPerformer queriesPerformer = new QueriesPerformer(analyser, similarity);
 
@@ -44,40 +48,32 @@ public class Main {
     }
 
     private static void readingIndex(QueriesPerformer queriesPerformer) {
-        queriesPerformer.printTopRankingTerms("authors", 10);
+        queriesPerformer.printTopRankingTerms("authors", 1);
         queriesPerformer.printTopRankingTerms("title", 10);
     }
 
     private static void searching(QueriesPerformer queriesPerformer) {
-        // Example
-        queriesPerformer.query("compiler program");
-
-        // TODO student
-        // queriesPerformer.query(<containing the term Information Retrieval>);
-        // queriesPerformer.query(<containing both Information and Retrieval>);
-        // and so on for all the queries asked on the instructions...
-        //
-        // Reminder: it must print the total number of results and
-        // the top 10 results.
+        queriesPerformer.query("\"Information Retrieval\"");
+        queriesPerformer.query("Information Retrieval");
+        queriesPerformer.query("Information +Retrieval -Database");
+        queriesPerformer.query("Info*");
+        queriesPerformer.query("\"Information Retrieval\"~5");
     }
 
     private static Analyzer getAnalyzer() {
-        // TODO student... For the part "Indexing and Searching CACM collection
-        // - Indexing" use, as indicated in the instructions,
-        // the StandardAnalyzer class.
-        //
-        // For the next part "Using different Analyzers" modify this method
-        // and return the appropriate Analyzers asked.
+        // "Using different Analyzers" tests :
+//        return new StandardAnalyzer();
+//        return new WhitespaceAnalyzer();
+//        return new EnglishAnalyzer();
+//        return new ShingleAnalyzerWrapper(new StandardAnalyzer(), 2, 2);
+//        return new ShingleAnalyzerWrapper(new StandardAnalyzer(), 3, 3);
+//        return new StopAnalyzer();
 
-        Map<String, Analyzer> analyzerPerField = new HashMap<>();
-        analyzerPerField.put("authors", new KeywordAnalyzer());
-        analyzerPerField.put("title", new StandardAnalyzer());
-        analyzerPerField.put("summary", new StopAnalyzer());
-        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(
-                new StandardAnalyzer(), analyzerPerField);
-
-
-        return analyzer;
+        // treat the author field as a single word
+        Map<String, Analyzer> analyzerMap = new HashMap<>();
+        analyzerMap.put("authors", new KeywordAnalyzer());
+        return new PerFieldAnalyzerWrapper(
+                new EnglishAnalyzer(), analyzerMap);
     }
 
 }

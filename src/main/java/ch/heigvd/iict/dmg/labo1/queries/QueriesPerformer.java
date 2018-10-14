@@ -46,7 +46,6 @@ public class QueriesPerformer {
     public void printTopRankingTerms(String field, int numTerms) {
         // This methods print the top ranking term for a field.
         try {
-
             TermStats[] foundTerms = HighFreqTerms.getHighFreqTerms(indexReader, numTerms, field,
                     new HighFreqTerms.TotalTermFreqComparator());
 
@@ -59,11 +58,10 @@ public class QueriesPerformer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void query(String q) {
-        final int LIMIT = 20;
+        final int LIMIT = 10;
 
         QueryParser parser = new QueryParser("summary", analyzer);
 
