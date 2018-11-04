@@ -122,6 +122,8 @@ public class Evaluation {
         ///
         ///  Part I - Create the index
         ///
+
+        // For a given analyser, so one index per analyser
         Lab2Index lab2Index = new Lab2Index(analyzer);
         lab2Index.index("documents/cacm.txt");
 
@@ -133,6 +135,18 @@ public class Evaluation {
         ///
 
         // TODO student
+        // Metrics to use (using mainly queryResults and qrelResults):
+        // Summary stats (number of docs, retrieved docs etc)
+        // MAP, Average R-precision, Average precision at standard recall levels,
+
+        Map<Integer, List<Integer>> queryResults = new HashMap(queries.size());
+
+        for (int i = 1; i <= queries.size(); ++i) {
+            // Search results
+            queryResults.put(i, lab2Index.search(queries.get(i - 1)));
+        }
+
+
         // compute the metrics asked in the instructions
         // you may want to call these methods to get:
         // -  The query results returned by Lucene i.e. computed/empirical
@@ -152,6 +166,44 @@ public class Evaluation {
         // average precision at the 11 recall levels (0,0.1,0.2,...,1) over all queries
         double[] avgPrecisionAtRecallLevels = createZeroedRecalls();
 
+        for (int i = 1; i <= queryResults.size(); ++i) {
+            // Number of retrieved docs is the size of the queryResult List
+            totalRetrievedDocs += queryResults.get(i).size();
+            // Number of relevant docs, can be null
+            List<Integer> relevantDocsForQuery = qrels.get(i);
+
+            // null check since some queries have no relevant docs
+            if (relevantDocsForQuery != null) {
+                totalRelevantDocs += relevantDocsForQuery.size();
+
+                // Compare values of both lists to calculate retrieved relevant docs
+                List<Integer> relevantDocsInSearch = queryResults.get(i);
+                relevantDocsInSearch.retainAll(relevantDocsForQuery);
+                totalRetrievedRelevantDocs += relevantDocsInSearch.size();
+            }
+
+            // Increment R-precision
+            avgRPrecision += getRPrecision(queryResults.get(i), relevantDocsForQuery);
+
+            // Increment Interpolated precision
+            double[] interpolatedPrecisions = getInterpolatedPrecisions(queryResults.get(i), relevantDocsForQuery);
+            for (int j = 0; j < avgPrecisionAtRecallLevels.length; ++j) {
+                avgPrecisionAtRecallLevels[j] += interpolatedPrecisions[j];
+            }
+
+            // Increment MAP
+            meanAveragePrecision += averagePrecision(queryResults.get(i), relevantDocsForQuery);
+
+        }
+
+        // Divide relevant metrics by number of queries to get the mean
+        meanAveragePrecision /= queries.size();
+        avgRPrecision /= queries.size();
+        for(int i = 0; i < avgPrecisionAtRecallLevels.length; ++i){
+            avgPrecisionAtRecallLevels[i] /= queries.size();
+        }
+
+
         ///
         ///  Part IV - Display the metrics
         ///
@@ -162,6 +214,77 @@ public class Evaluation {
                 totalRetrievedRelevantDocs,
                 meanAveragePrecision, avgRPrecision,
                 avgPrecisionAtRecallLevels);
+    }
+
+    private static double averagePrecision(List<Integer> searchResults, List<Integer> trueResults) {
+        if (trueResults == null && searchResults.isEmpty()) { // No true results means precision of 1.0 if 0 search results (no false positives) or 0.0 if there were results.
+                return 1.0;
+            } else if (trueResults == null || searchResults.isEmpty()){
+                return 0.0;
+        } else {
+            double precision = 0.0;
+            int numberOfRanks = 0;
+            for (int i = 1; i <= searchResults.size(); i++) {
+                List<Integer> firstNResults = searchResults.subList(0, i);
+                List<Integer> relevantInFirstNResults = new ArrayList<>(firstNResults);
+                relevantInFirstNResults.retainAll(trueResults);
+                precision += relevantInFirstNResults.size() / (double) firstNResults.size();
+                numberOfRanks++;
+            }
+            // Average precision over each rank
+            return precision/numberOfRanks;
+        }
+    }
+
+
+    private static double getRPrecision(List<Integer> searchResults, List<Integer> trueResults) {
+        if (trueResults == null) { // No true results means R-precision of 1
+            return 1.0;
+        } else {
+            List<Integer> sublist;
+            if (searchResults.size() >= trueResults.size()) {
+                sublist = searchResults.subList(0, trueResults.size());
+            } else {
+                /*
+                http://www.ccs.neu.edu/home/ekanou/ISU535.09X2/Handouts/Review_Material/evaluation.pdf
+                "If this list contains less than R documents, we can always pad with
+                 list with non-relevant documents and evaluate R-precision of this list. "
+                 */
+                sublist = searchResults;
+            }
+            //Keep only relevant docs
+            sublist.retainAll(trueResults);
+            // We simply divide by R to avoid having to pad with non relevant results
+            return sublist.size() / trueResults.size();
+        }
+    }
+
+    private static double[] getInterpolatedPrecisions(List<Integer> searchResults, List<Integer> trueResults) {
+        double[] interpolatedPrecisions = createZeroedRecalls();
+        if(trueResults == null){
+            if(searchResults.isEmpty()){
+                for(int i = 0; i < interpolatedPrecisions.length; ++i){
+                    interpolatedPrecisions[i] = 1.0;
+                }
+            }
+            return interpolatedPrecisions;
+        }
+        double recall = 0.0;
+        double precision = 0.0;
+        for (int i = 1; i <= searchResults.size(); i++) {
+            List<Integer> firstNResults = searchResults.subList(0, i);
+            List<Integer> relevantInFirstNResults = firstNResults;
+            relevantInFirstNResults.retainAll(trueResults);
+            recall = relevantInFirstNResults.size() / (double) trueResults.size();
+            precision = relevantInFirstNResults.size() / (double) firstNResults.size();
+            // Update max precisions for current recall point
+            for (int level = 0; level <= 10 * Math.floor(recall); ++level) {
+                if (interpolatedPrecisions[level] < precision) {
+                    interpolatedPrecisions[level] = precision;
+                }
+            }
+        }
+        return interpolatedPrecisions;
     }
 
     private static void displayMetrics(
@@ -192,3 +315,10 @@ public class Evaluation {
         return recalls;
     }
 }
+
+/*
+ else { // No true results for that query
+                avgRPrecision += 1.0; // See report for justification
+
+            }
+ */
