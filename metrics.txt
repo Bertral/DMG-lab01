@@ -1,0 +1,95 @@
+StandardAnalyzer:
+
+Number of queries: 64
+Number of qrels: 52
+Average number of relevant docs per query: 15.307692307692308
+Number of indexed documents: 3204
+Number of retrieved documents: 47211
+Number of relevant documents: 796
+Number of relevant documents retrieved: 620
+MAP: 0.796875
+Average R-Precision: 0.4375
+Average precision at recall levels: 
+	0: 0.796875
+	1: 0.796875
+	2: 0.796875
+	3: 0.796875
+	4: 0.78125
+	5: 0.78125
+	6: 0.71875
+	7: 0.65625
+	8: 0.5625
+	9: 0.359375
+	10: 0.25
+
+WhitespaceAnalyzer:
+
+Number of queries: 64
+Number of qrels: 52
+Average number of relevant docs per query: 15.307692307692308
+Number of indexed documents: 3204
+Number of retrieved documents: 121648
+Number of relevant documents: 796
+Number of relevant documents retrieved: 680
+MAP: 0.8125
+Average R-Precision: 0.53125
+Average precision at recall levels: 
+	0: 0.8125
+	1: 0.8125
+	2: 0.8125
+	3: 0.78125
+	4: 0.765625
+	5: 0.75
+	6: 0.75
+	7: 0.734375
+	8: 0.625
+	9: 0.515625
+	10: 0.34375
+	
+EnglishAnalyzer (default stopwords):
+
+Number of queries: 64
+Number of qrels: 52
+Average number of relevant docs per query: 15.307692307692308
+Number of indexed documents: 3204
+Number of retrieved documents: 82734
+Number of relevant documents: 796
+Number of relevant documents retrieved: 720
+MAP: 0.796875
+Average R-Precision: 0.609375
+Average precision at recall levels: 
+	0: 0.796875
+	1: 0.796875
+	2: 0.796875
+	3: 0.796875
+	4: 0.78125
+	5: 0.78125
+	6: 0.78125
+	7: 0.78125
+	8: 0.75
+	9: 0.578125
+	10: 0.421875
+	
+EnglishAnalyzer (common_words.txt):
+
+Number of queries: 64
+Number of qrels: 52
+Average number of relevant docs per query: 15.307692307692308
+Number of indexed documents: 3204
+Number of retrieved documents: 74608
+Number of relevant documents: 796
+Number of relevant documents retrieved: 717
+MAP: 0.796875
+Average R-Precision: 0.59375
+Average precision at recall levels: 
+	0: 0.796875
+	1: 0.796875
+	2: 0.796875
+	3: 0.796875
+	4: 0.78125
+	5: 0.78125
+	6: 0.78125
+	7: 0.78125
+	8: 0.75
+	9: 0.5625
+	10: 0.40625

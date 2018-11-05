@@ -1,6 +1,9 @@
 package ch.heigvd.iict.dmg.labo2;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import java.io.BufferedReader;
@@ -116,7 +119,22 @@ public class Evaluation {
         ///
         // TODO student: compare Analyzers here i.e. change analyzer to
         // the asked analyzers once the metrics have been implemented
+
+        // Standard analyzer
         Analyzer analyzer = new StandardAnalyzer();
+
+        // Whitespace analyzer
+        //Analyzer analyzer = new WhitespaceAnalyzer();
+
+        // English analyzer
+        //Analyzer analyzer = new EnglishAnalyzer();
+
+        // English analyzer with custom stopwords:
+        //CharArraySet stopwords = new CharArraySet(commonWords, true);
+        //Analyzer analyzer = new EnglishAnalyzer(stopwords);
+
+
+
 
 
         ///
@@ -196,7 +214,7 @@ public class Evaluation {
 
         }
 
-        // Divide relevant metrics by number of queries to get the mean
+        // Divide  metrics by number of queries to get the mean (where relevant)
         meanAveragePrecision /= queries.size();
         avgRPrecision /= queries.size();
         for(int i = 0; i < avgPrecisionAtRecallLevels.length; ++i){
@@ -273,12 +291,12 @@ public class Evaluation {
         double precision = 0.0;
         for (int i = 1; i <= searchResults.size(); i++) {
             List<Integer> firstNResults = searchResults.subList(0, i);
-            List<Integer> relevantInFirstNResults = firstNResults;
+            List<Integer> relevantInFirstNResults = new ArrayList<>(firstNResults);
             relevantInFirstNResults.retainAll(trueResults);
             recall = relevantInFirstNResults.size() / (double) trueResults.size();
             precision = relevantInFirstNResults.size() / (double) firstNResults.size();
             // Update max precisions for current recall point
-            for (int level = 0; level <= 10 * Math.floor(recall); ++level) {
+            for (int level = 0; level <= Math.floor(10*recall); ++level) {
                 if (interpolatedPrecisions[level] < precision) {
                     interpolatedPrecisions[level] = precision;
                 }
@@ -315,10 +333,3 @@ public class Evaluation {
         return recalls;
     }
 }
-
-/*
- else { // No true results for that query
-                avgRPrecision += 1.0; // See report for justification
-
-            }
- */
